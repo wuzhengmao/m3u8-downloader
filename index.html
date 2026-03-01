@@ -575,12 +575,12 @@
         let { href } = location
         if (href.indexOf('?source=') > -1) {
           this.url = href.split('?source=')[1]
-          var urlObj = new URL(this.url)
-          this.title = urlObj.searchParams.get('title') || this.title // 获取视频标题
-          if (this.title) {
-            urlObj.searchParams.delete('title')
-            this.url = urlObj.href
-          }
+        }
+        var urlObj = new URL(this.url)
+        this.title = urlObj.searchParams.get('title') || this.title // 获取视频标题
+        if (this.title) {
+          urlObj.searchParams.delete('title')
+          this.url = urlObj.href
         }
       },
 
@@ -604,6 +604,7 @@
 
       // URL发生变化
       onUrlChanged(event) {
+        console.log('event:', event);
         var urlObj = new URL(event.data)
         urlObj.searchParams.delete('title')
         this.url = urlObj.href
