@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         m3u8-downloader
-// @namespace    https://github.com/Momo707577045/m3u8-downloader
+// @namespace    https://github.com/wuzhengmao/m3u8-downloader
 // @version      0.10.1
-// @description  https://github.com/Momo707577045/m3u8-downloader 配套插件
+// @description  https://github.com/wuzhengmao/m3u8-downloader 配套插件
 // @author       Momo707577045
 // @include      *
-// @exclude      http://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html
-// @exclude      https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html
+// @exclude      http://m3u8-downloader.mingy.org/index.html
+// @exclude      https://m3u8-downloader.mingy.org/index.html
 // @exclude      https://www.bilibili.com/*
-// @downloadURL	 https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/m3u8-downloader.user.js
-// @updateURL	   https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/m3u8-downloader.user.js
+// @downloadURL	 https://m3u8-downloader.mingy.org/m3u8-downloader.user.js
+// @updateURL	   https://m3u8-downloader.mingy.org/m3u8-downloader.user.js
 // @grant        none
 // @run-at document-start
 // ==/UserScript==
@@ -71,7 +71,7 @@
           m3u8Target = urlObj.href
           console.log('【m3u8】----------------------------------------')
           console.log(urlObj)
-          console.log('http://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html?source=' + m3u8Target)
+          console.log('http://m3u8-downloader.mingy.org/index.html?source=' + m3u8Target)
         }
       }
     })
@@ -123,6 +123,45 @@
     window.XMLHttpRequest.LOADING = originXHR.LOADING;
     window.XMLHttpRequest.DONE = originXHR.DONE;
     window.XMLHttpRequest.prototype = originXHR.prototype;
+
+    if (location.hostname === 'www.javrate.com') {
+      const originalFetch = window.fetch;
+      window.fetch = function(...args) {
+        return originalFetch.apply(this, args).then(response => {
+          if (args[0] === '/api/token/generate') {
+            response.clone().json().then(json => {
+              if (json.success && m3u8Target) {
+                var url = m3u8Target;
+                url = replaceUrl(url, 'bcdn_token', json.data.token);
+                url = replaceUrl(url, 'expires', json.data.expires);
+                url = replaceUrl(url, 'token_path', json.data.tokenPath);
+                m3u8Target = url;
+                console.log('m3u8 url: ', m3u8Target);
+                window.dispatchEvent(new CustomEvent('url-changed', {data: url}))
+              }
+            });
+          }
+          return response;
+        });
+      };
+    }
+  }
+
+  function replaceUrl(url, key, value) {
+    var i = url.indexOf(key + '=');
+    if (i < 0) {
+      return url;
+    }
+    var j = url.indexOf('&', i);
+    if (j < 0) {
+      j = url.indexOf('/', i);
+    }
+    if (j < 0) {
+      url = url.substring(0, i + key.length + 1) + value;
+    } else {
+      url = url.substring(0, i + key.length + 1) + value + url.substring(j);
+    }
+    return url;
   }
 
   // 获取顶部 window title，因可能存在跨域问题，故使用 try catch 进行保护
@@ -216,7 +255,7 @@
     })
 
     m3u8Jump.addEventListener('click', function () {
-      windowOpen('//blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html?source=' + m3u8Target)
+      windowOpen('//m3u8-downloader.mingy.org/index.html?source=' + m3u8Target)
     })
 
     m3u8Append.addEventListener('click', function () {
@@ -228,7 +267,7 @@
         s.parentNode.insertBefore(hm, s);
       })();
       ajax({
-        url: 'https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html?t=' + new Date().getTime(),
+        url: 'https://m3u8-downloader.mingy.org/index.html?t=' + new Date().getTime(),
         success: (fileStr) => {
           let fileList = fileStr.split(`<!--vue 前端框架--\>`);
           let dom = fileList[0];
@@ -262,13 +301,13 @@
               $streamSaver.innerHTML = streamSaverStr
               document.body.appendChild($streamSaver);
               ajax({ // 加载 mp4 转码
-                url: 'https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/mux-mp4.js',
+                url: 'https://m3u8-downloader.mingy.org/mux-mp4.js',
                 success: (mp4Str) => {
                   let $mp4 = document.createElement('script')
                   $mp4.innerHTML = mp4Str
                   document.body.appendChild($mp4);
                   ajax({ // 加载 stream 流式下载器
-                    url: 'https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/aes-decryptor.js',
+                    url: 'https://m3u8-downloader.mingy.org/aes-decryptor.js',
                     success: (aseStr) => {
                       let $ase = document.createElement('script')
                       $ase.innerHTML = aseStr
@@ -292,11 +331,11 @@
 
           // // 加载 ASE 解密
           // let $ase = document.createElement('script')
-          // $ase.src = 'https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/aes-decryptor.js'
+          // $ase.src = 'https://m3u8-downloader.mingy.org/aes-decryptor.js'
 
           // // 加载 mp4 转码
           // let $mp4 = document.createElement('script')
-          // $mp4.src = 'https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/mux-mp4.js'
+          // $mp4.src = 'https://m3u8-downloader.mingy.org/mux-mp4.js'
 
           // // 加载 vue
           // let $vue = document.createElement('script')

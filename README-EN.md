@@ -1,7 +1,7 @@
 # m3u8 downloader in web
 
 ![界面](http://upyun.luckly-mjw.cn/Assets/m3u8-download/01.jpeg)
-### [Tool online address](http://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index-en.html)，Chrome browser is recommended。
+### [Tool online address](http://m3u8-downloader.mingy.org/index-en.html)，Chrome browser is recommended。
 
 ### R & D background
 - Introduction of m3u8 video format
@@ -114,7 +114,7 @@ Except vue.js This tool code is included in the index.html It's in the file. Inc
 
 Listing the amount of code is just to show that this tool only applies the common knowledge of JS and is not complicated. We encourage you to try to read the source code. In fact, it's not as difficult as you think.
 
-### [Source code link](https://github.com/Momo707577045/m3u8-downloader/blob/master/index.html)
+### [Source code link](https://github.com/wuzhengmao/m3u8-downloader/blob/master/index.html)
 
 ### AES general decryption function
 - With the help of 「aes-decryptor.js」，The document comes from [hls.js](https://github.com/video-dev/hls.js)
@@ -125,7 +125,7 @@ Listing the amount of code is just to show that this tool only applies the commo
 - I have forked the project and fixed the bug. The link of the project after the repair is [here](https://github.com/Momo707577045/mux.js)
 
 ### Third party access
-- In the URL, you can splice the download address through the source parameter, such as：```http://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html?source=https://upyun.luckly-mjw.cn/Assets/media-source/example/media/index.m3u8```
+- In the URL, you can splice the download address through the source parameter, such as：```http://m3u8-downloader.mingy.org/index.html?source=https://upyun.luckly-mjw.cn/Assets/media-source/example/media/index.m3u8```
 - The system will automatically resolve the parameter
 
     ![](http://upyun.luckly-mjw.cn/Assets/m3u8-download/16.jpeg)

@@ -5,10 +5,10 @@
 
 
 
-# m3u8 视频在线提取工具([English version](https://github.com/Momo707577045/m3u8-downloader/blob/master/README-EN.md))
+# m3u8 视频在线提取工具([English version](https://github.com/wuzhengmao/m3u8-downloader/blob/master/README-EN.md))
 
 ![界面](./imgs/01.jpeg)
-### [工具在线地址](http://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html)，推荐使用 chrome 浏览器。
+### [工具在线地址](http:///tool-show/m3u8-downloader/index.html)，推荐使用 chrome 浏览器。
 
 ### 研发背景
 - m3u8视频格式简介
@@ -121,7 +121,7 @@
 
 罗列这些代码量只是想表明，本工具运用到的都只是 JS 的常见知识，并不复杂。鼓励大家多尝试阅读源码，其实看源码并没有想象中的那么困难。
 
-### [源码链接](https://github.com/Momo707577045/m3u8-downloader/blob/master/index.html)
+### [源码链接](https://github.com/wuzhengmao/m3u8-downloader/blob/master/index.html)
 
 ### AES 常规解密功能
 - 借助「aes-decryptor.js」，该文件来至 [hls.js](https://github.com/video-dev/hls.js)
@@ -132,19 +132,19 @@
 - 本人已 fork 该项目，并修复该 bug，修复后的项目[链接在这里](https://github.com/Momo707577045/mux.js)
 
 ### 第三方接入
-- 在 url 中通过 source 参数拼接下载地址即可，如：```http://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html?source=https://upyun.luckly-mjw.cn/Assets/media-source/example/media/index.m3u8```
+- 在 url 中通过 source 参数拼接下载地址即可，如：```http://m3u8-downloader.mingy.org/index.html?source=https://upyun.luckly-mjw.cn/Assets/media-source/example/media/index.m3u8```
 - 系统将自动解析该参数
 
     ![](./imgs/16.jpeg)
 
 
-### [油猴插件](https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/m3u8-downloader.user.js)
+### [油猴插件](https://m3u8-downloader.mingy.org/m3u8-downloader.user.js)
 
 ![](./imgs/15.jpeg)
 
 - 「跳转下载」即新开页面，打开本工具页面，自动携带并解析目标地址
 - 「注入下载」为解决跨域而生，直接将代码注入到当前视频网站，进行视频下载
-- 插件源码: https://github.com/Momo707577045/m3u8-downloader/blob/master/m3u8-downloader.user.js
+- 插件源码: https://github.com/wuzhengmao/m3u8-downloader/blob/master/m3u8-downloader.user.js
 - 手动添加油猴插件步骤
   - 点击 tamper-monkey「油猴」icon，点击「添加新脚本」
 

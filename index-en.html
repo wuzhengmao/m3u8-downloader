@@ -143,7 +143,7 @@
       background-size: 30px 30px;
       background-repeat: no-repeat;
       background-position: center center;
-      background-image: url(https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/imgs/close.png);
+      background-image: url(https://m3u8-downloader.mingy.org/imgs/close.png);
       background-color: rgba(0, 0, 0, 0.5);
     }
 
@@ -397,16 +397,16 @@
   <section id="m-app" v-cloak>
     <!--顶部操作提示-->
     <section class="m-p-action g-box">{{tips}}</section>
-    <a class="m-p-help" target="_blank" href="https://github.com/Momo707577045/m3u8-downloader/blob/master/README-EN.md">?</a>
-    <a class="m-p-tamper" target="_blank" href="https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/m3u8-downloader.user.js">tamperMonkey plugin</a>
-    <a class="m-p-github" target="_blank" href="https://github.com/Momo707577045/m3u8-downloader">github</a>
-    <a class="m-p-language" href="https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html">中文版</a>
-    <a class="m-p-other" target="_blank" href="https://blog.luckly-mjw.cn/tool-show/index.html">other efficiency tools</a>
+    <a class="m-p-help" target="_blank" href="https://github.com/wuzhengmao/m3u8-downloader/blob/master/README-EN.md">?</a>
+    <a class="m-p-tamper" target="_blank" href="https://m3u8-downloader.mingy.org/m3u8-downloader.user.js">tamperMonkey plugin</a>
+    <a class="m-p-github" target="_blank" href="https://github.com/wuzhengmao/m3u8-downloader">github</a>
+    <a class="m-p-language" href="https://m3u8-downloader.mingy.org/index.html">中文版</a>
+    <a class="m-p-other" target="_blank" href="https://m3u8-downloader.mingy.org/index.html">other efficiency tools</a>
 
     <!--广告-->
     <a v-if="isShowRefer" class="m-p-refer" target="_blank" href="https://segmentfault.com/a/1190000024416860">
-      <img src="https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/imgs/001.png" class="link">
-      <img src="https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/imgs/003.png" class="text">
+      <img src="https://m3u8-downloader.mingy.org/imgs/001.png" class="link">
+      <img src="https://m3u8-downloader.mingy.org/imgs/003.png" class="text">
       <i class="close" @click.prevent="isShowRefer=false"></i>
     </a>
 
@@ -521,6 +521,12 @@
         let { href } = location
         if (href.indexOf('?source=') > -1) {
           this.url = href.split('?source=')[1]
+          var urlObj = new URL(this.url)
+          this.title = urlObj.searchParams.get('title') || this.title // 获取视频标题
+          if (this.title) {
+            urlObj.searchParams.delete('title')
+            this.url = urlObj.href
+          }
         }
       },
 
@@ -592,14 +598,14 @@
 
         // 在下载页面才触发，代码注入的页面不需要校验
         // 当前协议不一致，切换协议
-        if (location.href.indexOf('blog.luckly-mjw.cn') > -1 && this.url.indexOf(location.protocol) === -1) {
+        if (location.href.indexOf('m3u8-downloader.mingy.org') > -1 && this.url.indexOf(location.protocol) === -1) {
           //alert('The current protocol is inconsistent, redirect to the correct page to download again')
-          location.href = `${this.url.split(':')[0]}://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index-en.html?source=${this.url}`
+          location.href = `${this.url.split(':')[0]}://m3u8-downloader.mingy.org/index-en.html?source=${this.url}`
           return
         }
 
         // 在下载页面才触发，修改页面 URL，携带下载路径，避免刷新后丢失
-        if (location.href.indexOf('blog.luckly-mjw.cn') > -1) {
+        if (location.href.indexOf('m3u8-downloader.mingy.org') > -1) {
           window.history.replaceState(null, '', `${location.href.split('?')[0]}?source=${this.url}`)
         }
 

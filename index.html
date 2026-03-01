@@ -149,7 +149,7 @@
       background-size: 30px 30px;
       background-repeat: no-repeat;
       background-position: center center;
-      background-image: url(https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/imgs/close.png);
+      background-image: url(https://m3u8-downloader.mingy.org/imgs/close.png);
       background-color: rgba(0, 0, 0, 0.5);
     }
 
@@ -415,10 +415,10 @@
     页面加载中，请耐心等待...
     <h1 style="white-space: pre;">
       推荐一个 m3u8 网页版提取工具，无需下载软件，打开网站即可下载，自动检测，一键下载。
-      工具链接：https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html
+      工具链接：https://m3u8-downloader.mingy.org/index.html
       工具教程：https://segmentfault.com/a/1190000021847172?_ea=32289224
       <img src="https://upyun.luckly-mjw.cn/Assets/blog/m3u8-downloader-121-75.jpeg" alt="m3u8 视频下载工具" title="logo" />
-      <a target="_blank" href="https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html">点击跳转</a>
+      <a target="_blank" href="https://m3u8-downloader.mingy.org/index.html">点击跳转</a>
     </h1>
   </div>
   <section id="m-app" v-cloak>
@@ -426,15 +426,15 @@
     <section class="m-p-action g-box">{{tips}}</section>
     <a class="m-p-help" target="_blank" href="https://segmentfault.com/a/1190000021847172">?</a>
     <a class="m-p-mse" target="_blank" href="https://github.com/Momo707577045/media-source-extract">无差别提取工具</a>
-    <a class="m-p-tamper" target="_blank" href="https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/m3u8-downloader.user.js">手动添加/更新油猴插件</a>
-    <a class="m-p-github" target="_blank" href="https://github.com/Momo707577045/m3u8-downloader">github</a>
-    <a class="m-p-other" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/index.html">其他实用工具</a>
-    <a class="m-p-language" href="http://blog.luckly-mjw.cn/tool-show/m3u8-downloader/index-en.html">English version</a>
+    <a class="m-p-tamper" target="_blank" href="https://m3u8-downloader.mingy.org/m3u8-downloader.user.js">手动添加/更新油猴插件</a>
+    <a class="m-p-github" target="_blank" href="https://github.com/wuzhengmao/m3u8-downloader">github</a>
+    <a class="m-p-other" target="_blank" href="http://m3u8-downloader.mingy.org/index.html">其他实用工具</a>
+    <a class="m-p-language" href="http://m3u8-downloader.mingy.org/index-en.html">English version</a>
 
     <!--广告-->
     <a v-if="isShowRefer" class="m-p-refer" target="_blank" href="https://segmentfault.com/a/1190000024416860">
-      <img src="https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/imgs/001.png" class="link">
-      <img src="https://blog.luckly-mjw.cn/tool-show/m3u8-downloader/imgs/003.png" class="text">
+      <img src="https://m3u8-downloader.mingy.org/imgs/001.png" class="link">
+      <img src="https://m3u8-downloader.mingy.org/imgs/003.png" class="text">
       <i class="close" @click.prevent="isShowRefer=false"></i>
     </a>
 
@@ -559,12 +559,14 @@
 
     created() {
       this.getSource();
+      window.addEventListener('url-changed', this.onUrlChanged)
       window.addEventListener('keyup', this.onKeyup)
       setInterval(this.retryAll.bind(this), 2000) // 每两秒重新下载一遍错误片段，实现错误自动重试
     },
 
     beforeDestroy() {
       window.removeEventListener('keyup', this.onKeyup)
+      window.removeEventListener('url-changed')
     },
 
     methods: {
@@ -573,6 +575,12 @@
         let { href } = location
         if (href.indexOf('?source=') > -1) {
           this.url = href.split('?source=')[1]
+          var urlObj = new URL(this.url)
+          this.title = urlObj.searchParams.get('title') || this.title // 获取视频标题
+          if (this.title) {
+            urlObj.searchParams.delete('title')
+            this.url = urlObj.href
+          }
         }
       },
 
@@ -592,6 +600,13 @@
         if (event.keyCode === 13) { // 键入ESC
           this.getM3U8()
         }
+      },
+
+      // URL发生变化
+      onUrlChanged(event) {
+        var urlObj = new URL(event.data)
+        urlObj.searchParams.delete('title')
+        this.url = urlObj.href
       },
 
       // ajax 请求
@@ -671,9 +686,9 @@
 
         // 在下载页面才触发，代码注入的页面不需要校验
         // 当前协议不一致，切换协议
-        if (location.href.indexOf('blog.luckly-mjw.cn') > -1 && this.url.indexOf(location.protocol) === -1) {
+        if (location.href.indexOf('m3u8-downloader.mingy.org') > -1 && this.url.indexOf(location.protocol) === -1) {
           const targetUrl = new URL(this.url)
-          const targetLink = `${targetUrl.protocol}//blog.luckly-mjw.cn/tool-show/m3u8-downloader/index.html?source=${this.url}`;
+          const targetLink = `${targetUrl.protocol}//m3u8-downloader.mingy.org/index.html?source=${this.url}`;
           if (targetUrl.protocol === 'http:') {
             this.copyToClipboard(targetLink);
             alert('由于浏览器限制，无法从 https 跳转至 http。请在访问 http 协议页面，页面 url 已复制，直接粘贴使用即可')
@@ -684,7 +699,7 @@
         }
 
         // 在下载页面才触发，修改页面 URL，携带下载路径，避免刷新后丢失
-        if (location.href.indexOf('blog.luckly-mjw.cn') > -1) {
+        if (location.href.indexOf('m3u8-downloader.mingy.org') > -1) {
           window.history.replaceState(null, '', `${location.href.split('?')[0]}?source=${this.url}`)
         }
 
@@ -703,7 +718,7 @@
               // 放开片段后缀限制，下载非 # 开头的链接片段
               if (/^[^#]/.test(item)) {
                 console.log(item)
-                this.tsUrlList.push(this.applyURL(item, this.url))
+                this.tsUrlList.push(item)
                 this.finishList.push({
                   title: item,
                   status: ''
@@ -807,7 +822,7 @@
           if (this.finishList[index] && this.finishList[index].status === '') {
             this.finishList[index].status = 'downloading'
             this.ajax({
-              url: this.tsUrlList[index],
+              url: this.applyURL(this.tsUrlList[index], this.url),
               type: 'file',
               success: (file) => {
                 this.dealTS(file, index, () => this.downloadIndex < this.rangeDownload.endSegment && !isPause && download())
@@ -897,7 +912,7 @@
         if (this.finishList[index].status === 'error') {
           this.finishList[index].status = ''
           this.ajax({
-            url: this.tsUrlList[index],
+            url: this.applyURL(this.tsUrlList[index], this.url),
             type: 'file',
             success: (file) => {
               this.errorNum--
