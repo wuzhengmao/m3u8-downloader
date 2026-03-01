@@ -604,8 +604,7 @@
 
       // URL发生变化
       onUrlChanged(event) {
-        console.log('event:', event);
-        var urlObj = new URL(event.data)
+        var urlObj = new URL(event.detail)
         urlObj.searchParams.delete('title')
         this.url = urlObj.href
       },

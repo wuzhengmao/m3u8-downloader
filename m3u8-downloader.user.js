@@ -137,7 +137,7 @@
                 url = replaceUrl(url, 'token_path', json.data.tokenPath);
                 m3u8Target = url;
                 console.log('m3u8 url: ', m3u8Target);
-                window.dispatchEvent(new CustomEvent('url-changed', {data: url}))
+                window.dispatchEvent(new CustomEvent('url-changed', {detail: url}))
               }
             });
           }
