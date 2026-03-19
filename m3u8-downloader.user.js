@@ -125,25 +125,67 @@
     window.XMLHttpRequest.prototype = originXHR.prototype;
 
     if (location.hostname === 'www.javrate.com') {
+      let apiSecret;
+      let payload;
+      let headers;
+      let token;
+      window.addEventListener('player-module-ready', function() {
+        const originalCreatePlayer = window.createPlayer;
+        window.createPlayer = o => {
+          console.log('apiSecret: ', o.apiSecret);
+          apiSecret = o.apiSecret;
+          return originalCreatePlayer.call(this, o);
+        };
+      }, true);
       const originalFetch = window.fetch;
-      window.fetch = function(...args) {
-        return originalFetch.apply(this, args).then(response => {
-          if (args[0] === '/api/token/generate') {
+      window.fetch = async function(input, init) {
+        const request = new Request(input, init);
+        if (input === '/api/token/generate') {
+          headers = init.headers;
+          payload = await request.clone().json();
+        }
+        return originalFetch(request).then(response => {
+          if (input === '/api/token/generate') {
             response.clone().json().then(json => {
-              if (json.success && m3u8Target) {
-                var url = m3u8Target;
-                url = replaceUrl(url, 'bcdn_token', json.data.token);
-                url = replaceUrl(url, 'expires', json.data.expires);
-                url = replaceUrl(url, 'token_path', json.data.tokenPath);
-                m3u8Target = url;
-                console.log('m3u8 url: ', m3u8Target);
-                window.dispatchEvent(new CustomEvent('url-changed', {detail: url}))
+              if (json.success) {
+                token = json.data;
+                if (m3u8Target) {
+                  var url = m3u8Target;
+                  url = replaceUrl(url, 'bcdn_token', token.token);
+                  url = replaceUrl(url, 'expires', token.expires);
+                  url = replaceUrl(url, 'token_path', token.tokenPath);
+                  m3u8Target = url;
+                  console.log('m3u8 url: ', m3u8Target);
+                  window.dispatchEvent(new CustomEvent('url-changed', {detail: url}));
+                }
               }
             });
           }
           return response;
         });
       };
+      window.setInterval(async () => {
+        const now = Date.now();
+        if (token && token.expires * 1000 - now < 5000) {
+          const t = Math.floor(now / 1000);
+          const s = `${payload.movieId}|${t}|${payload.sessionId}`;
+          const c = new TextEncoder;
+          const e = await crypto.subtle.importKey("raw", c.encode(apiSecret), {
+            name: "HMAC",
+            hash: "SHA-256"
+          }, !1, ["sign"]);
+          const a = await crypto.subtle.sign("HMAC", e, c.encode(s));
+          const sign = btoa(String.fromCharCode(...new Uint8Array(a)))
+          console.log('signature: ', sign);
+          payload.signature = sign;
+          payload.timestamp = t;
+          window.fetch('/api/token/generate', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload)
+          });
+        }
+      }, 1000);
     }
   }
 
@@ -393,6 +435,82 @@
     document.body.appendChild($section);
   }
 
+  function resetTimer() {
+    const workerCode = `
+      const timers = {};
+      self.onmessage = function(e) {
+        const {cmd, id, delay} = e.data;
+        if (cmd === "setTimeout") {
+          timers[id] = setTimeout(() => {
+            postMessage({id});
+            delete timers[id];
+          }, delay);
+        }
+        if (cmd === "setInterval") {
+          timers[id] = setInterval(() => {
+            postMessage({id});
+          }, delay);
+        }
+        if (cmd === "clearTimeout" || cmd === "clearInterval") {
+          clearTimeout(timers[id]);
+          clearInterval(timers[id]);
+          delete timers[id];
+        }
+      };
+    `;
+    const blob = new Blob([workerCode], { type: "application/javascript" });
+    const worker = new Worker(URL.createObjectURL(blob));
+    let id = 1;
+    const callbacks = {};
+    worker.onmessage = function (e) {
+      const cb = callbacks[e.data.id];
+      if (cb) cb();
+    };
+    function workerSetTimeout(callback, delay) {
+      const timerId = id++;
+      callbacks[timerId] = function () {
+        callback();
+        delete callbacks[timerId];
+      };
+      worker.postMessage({
+        cmd: "setTimeout",
+        id: timerId,
+        delay
+      });
+      return timerId;
+    }
+    function workerClearTimeout(timerId) {
+      delete callbacks[timerId];
+      worker.postMessage({
+        cmd: "clearTimeout",
+        id: timerId
+      });
+    }
+    function workerSetInterval(callback, delay) {
+      const timerId = id++;
+      callbacks[timerId] = callback;
+      worker.postMessage({
+        cmd: "setInterval",
+        id: timerId,
+        delay
+      });
+      return timerId;
+    }
+    function workerClearInterval(timerId) {
+      delete callbacks[timerId];
+      worker.postMessage({
+        cmd: "clearInterval",
+        id: timerId
+      });
+    }
+    // 替换全局timer
+    window.setTimeout = workerSetTimeout;
+    window.clearTimeout = workerClearTimeout;
+    window.setInterval = workerSetInterval;
+    window.clearInterval = workerClearInterval;
+  }
+
+  resetTimer()
   resetAjax()
   checkVideo()
 })();
